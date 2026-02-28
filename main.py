@@ -110,7 +110,7 @@ async def call_llm(user_message: str) -> dict:
     if not api_key:
         raise HTTPException(
             status_code=500,
-            detail="未配置 API_KEY，请在 .env 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY 或 API_KEY",
+            detail="Vercel线上没读到密码，请检查DEEPSEEK_API_KEY是否配置正确",
         )
 
     payload = {
