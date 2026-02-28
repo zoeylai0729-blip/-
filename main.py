@@ -17,7 +17,8 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import httpx
 
-load_dotenv()
+# 尝试加载 .env 文件（本地开发用），如果不存在则使用系统环境变量（Vercel 等云平台）
+load_dotenv(override=False)
 
 app = FastAPI(title="副业天赋分析 API")
 app.add_middleware(
