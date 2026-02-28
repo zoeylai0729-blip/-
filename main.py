@@ -103,14 +103,14 @@ def extract_json_from_content(content: str) -> dict:
 
 async def call_llm(user_message: str) -> dict:
     """调用 OpenAI 兼容接口（如 DeepSeek / GPT-4）."""
-    api_key = os.getenv("OPENAI_API_KEY") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("API_KEY")
-    base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("API_BASE_URL")  # 例如 DeepSeek: https://api.deepseek.com
+    api_key = os.getenv("API_KEY") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
+    base_url = os.getenv("API_BASE_URL") or os.getenv("OPENAI_BASE_URL")  # 例如 DeepSeek: https://api.deepseek.com
     model = os.getenv("LLM_MODEL", "deepseek-chat")
 
     if not api_key:
         raise HTTPException(
             status_code=500,
-            detail="Vercel线上没读到密码，请检查DEEPSEEK_API_KEY是否配置正确",
+            detail="未配置 API_KEY，请在 .env 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY 或 API_KEY",
         )
 
     payload = {
