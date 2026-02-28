@@ -182,3 +182,15 @@ async def index():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+from fastapi import Request
+from fastapi.responses import JSONResponse
+
+@app.api_route("/{path_name:path}", methods=["GET"])
+def catch_all(request: Request, path_name: str):
+    if path_name == "":
+        return root()  # 空路径重定向到首页
+    return JSONResponse(
+        status_code=404,
+        content={"detail": f"页面 '/{path_name}' 不存在", "建议": "请返回首页"}
+    )
