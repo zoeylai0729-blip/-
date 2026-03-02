@@ -19,25 +19,25 @@ import httpx
 
 # 尝试加载 .env 文件（本地开发用），如果不存在则使用系统环境变量（Vercel 等云平台）
 # 仅本地环境加载 .env，Vercel 等云平台使用系统环境变量
-if os.getenv("VERCEL") is None:  # Vercel 会自动注入 VERCEL=1 环境变量
-    load_dotenv(override=True)  # 改为 override=True，确保本地 .env 覆盖系统变量
+if os.getenv("VERCEL") is None:  # Vercel 会自动注入 VERCEL=1 环境变量
+    load_dotenv(override=True)  # 改为 override=True，确保本地 .env 覆盖系统变量
 
 app = FastAPI(title="副业天赋分析 API")
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
 # ---------- 请求/响应模型 ----------
 class AnalyzeRequest(BaseModel):
-    bazi_string: str  # 八字字符串，如 "庚辰年 辛巳月 ..."
-    birth_date: str   # 公历生日，如 "2000.5.15"
-    gender: str       # "male" | "female"
-    birth_time: Optional[str] = None  # 出生时辰描述，如 "午时" 或 "11:00-13:00"
+    bazi_string: str  # 八字字符串，如 "庚辰年 辛巳月 ..."
+    birth_date: str   # 公历生日，如 "2000.5.15"
+    gender: str       # "male" | "female"
+    birth_time: Optional[str] = None  # 出生时辰描述，如 "午时" 或 "11:00-13:00"
 
 
 SYSTEM_PROMPT = """
@@ -52,11 +52,11 @@ SYSTEM_PROMPT = """
 
 # Analysis Logic
 1. 确定核心动能（十神定性）：
-  1. 食伤旺 -> 靠创意、表达、技能变现（创作者经济）。
-  2. 财星旺 -> 靠贸易、周转、资源整合（小商业经营，如闲鱼倒货（信息差）、羊毛党）。
-  3. 官杀旺 -> 靠体系、规则、秩序（整理师/把关人，如社群纪律管理员、简历修改/面试模拟、资料校对）。
-  4. 印星旺 -> 靠知识、输入、滋养（深度内容/咨询，如干货资料打包（卖信息差）、情感咨询/树洞、塔罗占卜）。
-  5. 比劫旺 -> 靠团队、社群、体力/耐力（渠道营销，如私域社群运营、同城跑腿/陪诊、地推、需要体力的副业。）。
+  1. 食伤旺 -> 靠创意、表达、技能变现（创作者经济）。
+  2. 财星旺 -> 靠贸易、周转、资源整合（小商业经营，如闲鱼倒货（信息差）、羊毛党）。
+  3. 官杀旺 -> 靠体系、规则、秩序（整理师/把关人，如社群纪律管理员、简历修改/面试模拟、资料校对）。
+  4. 印星旺 -> 靠知识、输入、滋养（深度内容/咨询，如干货资料打包（卖信息差）、情感咨询/树洞、塔罗占卜）。
+  5. 比劫旺 -> 靠团队、社群、体力/耐力（渠道营销，如私域社群运营、同城跑腿/陪诊、地推、需要体力的副业。）。
 2. 五行映射行业：结合喜用五行匹配 2026 年的热门赛道。
 3. 2026 流年干扰（丙午年）：重点分析「火」元素对用户日主的影响，给出当下的行动基调。
 
@@ -68,22 +68,22 @@ SYSTEM_PROMPT = """
 你必须返回纯 JSON，不要包含任何 Markdown 代码块（如 ```json）或其它说明文字。
 JSON 结构必须严格如下（字段名与类型不可改）：
 {
-  "identity_label": "核心搞钱人格的简短标签，如：知识二道贩子、天生销冠体质",
-  "identity_desc": "英文或中英混合的副标题，如：The Lord of Copy-Paste",
-  "tags": ["标签1", "标签2"],
-  "wealth_logic": ["天赋：...", "定位：...", "策略：..."],
-  "plan_a": {"title": "推荐方向A标题", "desc": "具体描述（做什么、怎么做，1-2句）", "reason": "命理理由（为什么适合你，1句）"},
-  "plan_b": {"title": "推荐方向B标题", "desc": "具体描述（做什么、怎么做，1-2句）", "reason": "命理理由（为什么适合你，1句）"},
-  "warning_reminder": "关键提醒（今年最该注意的事，1句）",
-  "warning_advice": "行动建议（该进还是该退，1句）"
+  "identity_label": "核心搞钱人格的简短标签，如：知识二道贩子、天生销冠体质",
+  "identity_desc": "英文或中英混合的副标题，如：The Lord of Copy-Paste",
+  "tags": ["标签1", "标签2"],
+  "wealth_logic": ["天赋：...", "定位：...", "策略：..."],
+  "plan_a": {"title": "推荐方向A标题", "desc": "具体描述（做什么、怎么做，1-2句）", "reason": "命理理由（为什么适合你，1句）"},
+  "plan_b": {"title": "推荐方向B标题", "desc": "具体描述（做什么、怎么做，1-2句）", "reason": "命理理由（为什么适合你，1句）"},
+  "warning_reminder": "关键提醒（今年最该注意的事，1句）",
+  "warning_advice": "行动建议（该进还是该退，1句）"
 }
 """
 
 
 def build_user_message(req: AnalyzeRequest) -> str:
-    gender_cn = "男" if req.gender == "male" else "女"
-    time_str = req.birth_time if req.birth_time else "不详（按平旦论）"
-    return f"""
+    gender_cn = "男" if req.gender == "male" else "女"
+    time_str = req.birth_time if req.birth_time else "不详（按平旦论）"
+    return f"""
 公历生日：{req.birth_date}
 性别：{gender_cn}
 出生时间：{time_str}
@@ -94,93 +94,91 @@ def build_user_message(req: AnalyzeRequest) -> str:
 
 
 def extract_json_from_content(content: str) -> dict:
-    """从模型返回中提取纯 JSON（去除 markdown 代码块等）."""
-    text = content.strip()
-    # 去掉 ```json ... ``` 包裹
-    m = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
-    if m:
-        text = m.group(1).strip()
-    return json.loads(text)
+    """从模型返回中提取纯 JSON（去除 markdown 代码块等）."""
+    text = content.strip()
+    # 去掉 ```json ... ``` 包裹
+    m = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
+    if m:
+        text = m.group(1).strip()
+    return json.loads(text)
 
 
 async def call_llm(user_message: str) -> dict:
-    """调用 OpenAI 兼容接口（如 DeepSeek / GPT-4）."""
-    api_key = os.getenv("API_KEY") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
-    base_url = os.getenv("API_BASE_URL") or os.getenv("OPENAI_BASE_URL")  # 例如 DeepSeek: https://api.deepseek.com
-    model = os.getenv("LLM_MODEL", "deepseek-chat")
+    """调用 OpenAI 兼容接口（如 DeepSeek / GPT-4）."""
+    api_key = os.getenv("API_KEY") or os.getenv("DEEPSEEK_API_KEY") or os.getenv("OPENAI_API_KEY")
+    base_url = os.getenv("API_BASE_URL") or os.getenv("OPENAI_BASE_URL")  # 例如 DeepSeek: https://api.deepseek.com
+    model = os.getenv("LLM_MODEL", "deepseek-chat")
 
-    if not api_key:
-        raise HTTPException(
-            status_code=500,
-            detail="未配置 API_KEY，请在 .env 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY 或 API_KEY",
-        )
+    if not api_key:
+        raise HTTPException(
+            status_code=500,
+            detail="未配置 API_KEY，请在 .env 中设置 OPENAI_API_KEY 或 DEEPSEEK_API_KEY 或 API_KEY",
+        )
 
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_message},
-        ],
-        "temperature": 0.6,
-    }
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
-    # 若已配置完整 chat completions 地址（如豆包/火山引擎），直接使用；否则按 OpenAI 兼容格式拼接
-    if base_url and base_url.strip():
-        base_url = base_url.strip().rstrip("/")
-        if "chat/completions" in base_url:
-            url = base_url
-        else:
-            url = f"{base_url}/v1/chat/completions"
-    else:
-        url = "https://api.openai.com/v1/chat/completions"
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message},
+        ],
+        "temperature": 0.6,
+    }
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+    # 若已配置完整 chat completions 地址（如豆包/火山引擎），直接使用；否则按 OpenAI 兼容格式拼接
+    if base_url and base_url.strip():
+        base_url = base_url.strip().rstrip("/")
+        if "chat/completions" in base_url:
+            url = base_url
+        else:
+            url = f"{base_url}/v1/chat/completions"
+    else:
+        url = "https://api.openai.com/v1/chat/completions"
 
-    async with httpx.AsyncClient(timeout=60.0) as client:
-        resp = await client.post(url, json=payload, headers=headers)
-        resp.raise_for_status()
-        data = resp.json()
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        resp = await client.post(url, json=payload, headers=headers)
+        resp.raise_for_status()
+        data = resp.json()
 
-    content = data["choices"][0]["message"]["content"]
-    return extract_json_from_content(content)
+    content = data["choices"][0]["message"]["content"]
+    return extract_json_from_content(content)
 
 
 @app.post("/analyze")
 async def analyze(req: AnalyzeRequest):
-    """接收八字、生日、性别等，调用大模型返回分析结果 JSON."""
-    try:
-        user_message = build_user_message(req)
-        result = await call_llm(user_message)
-        return result
-    except json.JSONDecodeError as e:
-        raise HTTPException(status_code=502, detail=f"大模型返回非合法 JSON: {str(e)}")
-    except httpx.HTTPStatusError as e:
-        raise HTTPException(
-            status_code=502,
-            detail="LLM 接口请求失败，请检查 .env 中的 API 地址与 Key",
-        )
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    """接收八字、生日、性别等，调用大模型返回分析结果 JSON."""
+    try:
+        user_message = build_user_message(req)
+        result = await call_llm(user_message)
+        return result
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=502, detail=f"大模型返回非合法 JSON: {str(e)}")
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(
+            status_code=502,
+            detail="LLM 接口请求失败，请检查 .env 中的 API 地址与 Key",
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/health")
 async def health():
     return {"status": "ok"}
 
+
 @app.get("/debug/env")
 async def debug_env():
     return {
-        "API_KEY": os.getenv("API_KEY") is not None,
+        "API_KEY": os.getenv("API_KEY") is not None,  # 只返回是否存在，不泄露密钥
         "DEEPSEEK_API_KEY": os.getenv("DEEPSEEK_API_KEY") is not None,
         "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY") is not None,
         "API_BASE_URL": os.getenv("API_BASE_URL"),
         "VERCEL_ENV": os.getenv("VERCEL"),
-        "load_dotenv": os.getenv("VERCEL") is None
+        "load_dotenv": os.getenv("VERCEL") is None  # 标记是否加载了 .env
     }
-
-async def health():
-    return {"status": "ok"}
 
 
 # 前端页面：同一服务提供 index.html，便于前后端同源访问
@@ -189,24 +187,24 @@ INDEX_HTML = Path(__file__).resolve().parent / "index.html"
 
 @app.get("/")
 async def index():
-    """返回前端页面，便于直接打开 http://127.0.0.1:8000 使用"""
-    if INDEX_HTML.exists():
-        return FileResponse(INDEX_HTML)
-    raise HTTPException(status_code=404, detail="index.html not found")
+    """返回前端页面，便于直接打开 http://127.0.0.1:8000 使用"""
+    if INDEX_HTML.exists():
+        return FileResponse(INDEX_HTML)
+    raise HTTPException(status_code=404, detail="index.html not found")
 
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 from fastapi import Request
 from fastapi.responses import JSONResponse
 
 @app.api_route("/{path_name:path}", methods=["GET"])
-def catch_all(request: Request, path_name: str):
-    if path_name == "":
-        return root()  # 空路径重定向到首页
-    return JSONResponse(
-        status_code=404,
-        content={"detail": f"页面 '/{path_name}' 不存在", "建议": "请返回首页"}
-    )
+async def catch_all(request: Request, path_name: str):
+    if path_name == "":
+        return await index()  # 修正：改为调用 index()
+    return JSONResponse(
+        status_code=404,
+        content={"detail": f"页面 '/{path_name}' 不存在", "建议": "请返回首页"}
+    )
