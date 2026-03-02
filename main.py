@@ -165,16 +165,20 @@ async def analyze(req: AnalyzeRequest):
 
 
 @app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 @app.get("/debug/env")
 async def debug_env():
-    return {
-        "API_KEY": os.getenv("API_KEY") is not None,  # 只返回是否存在，不泄露密钥
-        "DEEPSEEK_API_KEY": os.getenv("DEEPSEEK_API_KEY") is not None,
-        "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY") is not None,
-        "API_BASE_URL": os.getenv("API_BASE_URL"),
-        "VERCEL_ENV": os.getenv("VERCEL"),
-        "load_dotenv": os.getenv("VERCEL") is None  # 标记是否加载了 .env
-    }
+    return {
+        "API_KEY": os.getenv("API_KEY") is not None,
+        "DEEPSEEK_API_KEY": os.getenv("DEEPSEEK_API_KEY") is not None,
+        "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY") is not None,
+        "API_BASE_URL": os.getenv("API_BASE_URL"),
+        "VERCEL_ENV": os.getenv("VERCEL"),
+        "load_dotenv": os.getenv("VERCEL") is None
+    }
+
 async def health():
     return {"status": "ok"}
 
