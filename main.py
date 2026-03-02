@@ -39,7 +39,7 @@ SYSTEM_PROMPT = """
 # Tone
 - 专业严谨：避免使用「发大财」、「走大运」等江湖气词汇。
 - 现代感：将术语转化为商业术语。
-- 启发性：不做绝对化的预判，而是基于命理逻辑提供深度观察。
+- 启发性：不做绝对化的预判，基于命理逻辑提供深度观察。
 
 # Analysis Logic
 1. 确定核心动能（十神定性）：食伤、财星、官杀、印星、比劫。
@@ -143,4 +143,3 @@ async def catch_all(request: Request, path_name: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
