@@ -18,7 +18,9 @@ from pydantic import BaseModel
 import httpx
 
 # 尝试加载 .env 文件（本地开发用），如果不存在则使用系统环境变量（Vercel 等云平台）
-load_dotenv(override=False)
+# 仅本地环境加载 .env，Vercel 等云平台使用系统环境变量
+if os.getenv("VERCEL") is None:  # Vercel 会自动注入 VERCEL=1 环境变量
+    load_dotenv(override=True)  # 改为 override=True，确保本地 .env 覆盖系统变量
 
 app = FastAPI(title="副业天赋分析 API")
 app.add_middleware(
