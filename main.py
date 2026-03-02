@@ -13,7 +13,7 @@ from pydantic import BaseModel
 import httpx
 
 # Only load .env in local environment
-if os.getenv("VERCEL") is None:
+if not os.getenv("VERCEL"):
     load_dotenv(override=True)
 
 app = FastAPI(title="副业天赋分析 API")
@@ -143,3 +143,4 @@ async def catch_all(request: Request, path_name: str):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
